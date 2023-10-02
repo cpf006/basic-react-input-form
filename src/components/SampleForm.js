@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { DefaultValuesContext } from '../context/DefaultValuesContext';
 import '../styles/SampleForm.css';
@@ -8,11 +8,12 @@ const SampleForm = () => {
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
     defaultValues: defaultValues
   });
+  const [submittedData, setSubmittedData] = useState(null);
 
   const performHypothesisTest = watch("perform_hypothesis");
 
   const onSubmit = (data) => {
-    console.log(data);
+    setSubmittedData(data);
     // Here is where we would handle passing the data back to the server
   };
 
@@ -40,10 +41,6 @@ const SampleForm = () => {
             data-testid="sample_size"
             {...register("sample_size", {
               required: "Sample size is required",
-              pattern: {
-                value: /^[0-9]*(\.[0-9]+)?$/,
-                message: "Must be a valid numeric value"
-              },
               validate: value => (value >= 2 && Number.isInteger(parseFloat(value))) || "Sample size must be a whole number >= 2"
             })}
             className={`input ${errors.sample_size ? 'input-error' : ''}`}
@@ -61,10 +58,7 @@ const SampleForm = () => {
             data-testid="sample_mean"
             {...register("sample_mean", {
               required: "Sample mean is required",
-              pattern: {
-                value: /^[0-9]*(\.[0-9]+)?$/,
-                message: "Must be a valid numeric value"
-              }
+              validate: value => (!isNaN(value) && typeof parseFloat(value) === 'number') || "Must be a valid numeric value"
             })}
             className={`input ${errors.sample_mean ? 'input-error' : ''}`}
           />
@@ -81,11 +75,15 @@ const SampleForm = () => {
             data-testid="standard_deviation"
             {...register("standard_deviation", {
               required: "Standard deviation is required",
-              pattern: {
-                value: /^[0-9]*(\.[0-9]+)?$/,
-                message: "Must be a valid numeric value"
-              },
-              validate: value => (value > 0) || "Standard deviation must be > 0"
+              validate: value => {
+                if (!value || isNaN(value) || typeof parseFloat(value) !== 'number') {
+                  return "Must be a valid numeric value";
+                }
+                if (parseFloat(value) <= 0) {
+                  return "Standard deviation must be > 0";
+                }
+                return true;
+              }
             })}
             className={`input ${errors.standard_deviation ? 'input-error' : ''}`}
           />
@@ -116,10 +114,7 @@ const SampleForm = () => {
             data-testid="hypothesized_mean"
             {...register("hypothesized_mean", {
               required: performHypothesisTest ? "Hypothesized mean is required" : false,
-              pattern: {
-                value: /^[0-9]*(\.[0-9]+)?$/,
-                message: "Must be a valid numeric value"
-              }
+              validate: value => (!isNaN(value) && typeof parseFloat(value) === 'number') || "Must be a valid numeric value"
             })}
             className={`input ${errors.hypothesized_mean ? 'input-error' : ''}`}
             disabled={!performHypothesisTest}
@@ -128,9 +123,31 @@ const SampleForm = () => {
 
         <div className="button-group">
           <button type="submit" className="button-ok">OK</button>
-          <button type="button" onClick={() => reset(defaultValues)} className="button-reset">Reset</button>
+          <button type="button" onClick={() => {reset(defaultValues); setSubmittedData(null);}} className="button-reset">Reset</button>
         </div>
       </form>
+
+      {submittedData && (
+        <div className="submitted-data">
+          <h3>Submitted Data:</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(submittedData).map(([key, value]) => (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td>{value.toString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}     
     </div>
   );
 };

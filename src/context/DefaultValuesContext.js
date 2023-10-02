@@ -11,7 +11,7 @@ export const DefaultValuesProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/context/defaultValues.json')
+    fetch('defaultValues.json')
       .then((response) => response.json())
       .then((data) => {
         setDefaultValues(data);

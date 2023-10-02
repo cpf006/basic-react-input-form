@@ -9,18 +9,23 @@ export const DefaultValuesProvider = ({ children }) => {
     standard_deviation: null
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
-    fetch('defaultValues.json')
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchDefaultValues = async () => {
+      try { 
+        const response = await fetch('defaultValues.json');
+        const data = await response.json();
         setDefaultValues(data);
+      } catch (err) {
+        console.error('Error fetching default values:', err);
+        setError(err);
+      } finally {
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching default values:', error);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchDefaultValues();
   }, []);
 
   return (

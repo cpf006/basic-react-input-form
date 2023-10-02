@@ -10,7 +10,7 @@ A user-friendly form designed to capture statistical data related to a sample se
 
 - Standard Deviation: A measure of the amount of variation or dispersion in the set of values. It accepts any numeric value &gt; 0
 
-- Hypothesized Mean: The proposed average value against which the sample mean can be tested. This field becomes active only when the "Perform Hypothesis Test" checkbox is checked. It accepts any numeric value.
+- Hypothesized Mean: The proposed average value against which the sample mean can be tested. This field becomes active only when the "Perform Hypothesis Test" is checked. It accepts any numeric value.
 
 ## Available Scripts
 

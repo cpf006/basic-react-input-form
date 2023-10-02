@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { DefaultValuesContext } from '../../context/DefaultValuesContext';
 import SampleForm from '../../components/SampleForm';
 
@@ -36,59 +36,58 @@ describe('SampleForm Component', () => {
 
   it('shows and hides error message based on input validation for sample size', async () => {
     // Ensure the error message is not present on initial render
-    expect(screen.queryByText("Sample size must be a whole number >= 2")).not.toBeInTheDocument();
+    expect(screen.queryByText("Sample size must be a whole number >= 2")).not.toBeInTheDocument;
   
     // Make the sample size input invalid
-    const input = screen.getByTestId('sample_size');
-    fireEvent.change(input, { target: { value: '1.5' } });
-    fireEvent.click(screen.getByText('OK'));
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('sample_size'), { target: { value: '1.5' } });
+      fireEvent.click(screen.getByText('OK'));
+    });
   
     // Verify that the error message is displayed
-    await waitFor(() => {
-      expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument;
   
     // Correct the input
-    fireEvent.change(input, { target: { value: '3' } });
-    fireEvent.click(screen.getByText('OK'));
+    await act(async () => {
+      fireEvent.change(screen.getByTestId('sample_size'), { target: { value: '3' } });
+      fireEvent.click(screen.getByText('OK'));
+    });
   
     // Verify that the error message is no longer displayed
-    await waitFor(() => {
-      expect(screen.queryByText("Sample size must be a whole number >= 2")).not.toBeInTheDocument();
-    });
+    expect(screen.queryByText("Sample size must be a whole number >= 2")).not.toBeInTheDocument;
   });
 
   it('shows error when sample size is less than 2', async () => {
     const input = screen.getByTestId('sample_size');
     fireEvent.change(input, { target: { value: '1' } });
     fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument;
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument;
   });
 
   it('shows error when sample size is not a whole number', async () => {
     const input = screen.getByTestId('sample_size');
     fireEvent.change(input, { target: { value: '2.5' } });
     fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument;
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.getByText("Sample size must be a whole number >= 2")).toBeInTheDocument;
   });
 
   it('shows error when sample size is not a numeric value', async () => {
-    const input = screen.getByTestId('sample_size');
+    const input = screen.getByTestId('sample_mean');
     fireEvent.change(input, { target: { value: 'abc' } }); // Entering a non-numeric value
     fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Must be a valid numeric value")).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.getByText("Must be a valid numeric value")).toBeInTheDocument;
   });
 
   it('shows error when hypothesized mean is empty and perform hypothesis is checked', async () => {
@@ -96,40 +95,73 @@ describe('SampleForm Component', () => {
     fireEvent.click(checkbox);
     const input = screen.getByTestId('hypothesized_mean');
     fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Hypothesized mean is required")).toBeInTheDocument;
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.getByText("Hypothesized mean is required")).toBeInTheDocument;
   });
 
   it('shows error when sample mean is empty', async () => {
     const input = screen.getByTestId('sample_mean');
     fireEvent.change(input, { target: { value: '' } });
     fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Sample mean is required")).toBeInTheDocument;
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.getByText("Sample mean is required")).toBeInTheDocument;
   });
 
   it('shows error when standard deviation is less than or equal to 0', async () => {
     const input = screen.getByTestId('standard_deviation');
-    fireEvent.change(input, { target: { value: '0' } });
-    fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
-
-    await waitFor(() => {
-      expect(screen.getByText("Standard deviation must be > 0")).toBeInTheDocument;
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '0' } });
+      fireEvent.blur(input);
+      fireEvent.click(screen.getByText('OK'));
     });
 
-    fireEvent.change(input, { target: { value: '-1' } });
-    fireEvent.blur(input);
-    fireEvent.click(screen.getByText('OK'));
+    expect(screen.getByText("Standard deviation must be > 0")).toBeInTheDocument;
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '-1' } });
+      fireEvent.blur(input);
+      fireEvent.click(screen.getByText('OK'));
+    });
   
-    await waitFor(() => {
-      expect(screen.getByText("Standard deviation must be > 0")).toBeInTheDocument;
+    expect(screen.getByText("Standard deviation must be > 0")).toBeInTheDocument;
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '1' } });
+      fireEvent.blur(input);
+      fireEvent.click(screen.getByText('OK'));
     });
+
+    expect(screen.queryByText("Standard deviation must be > 0")).not.toBeInTheDocument;
+  });
+
+  it('displays submitted values in a table and clears them on reset', async () => {
+    // Change a value
+    const sampleSizeInput = screen.getByTestId('sample_size');
+    fireEvent.change(sampleSizeInput, { target: { value: '15' } });
+    fireEvent.blur(sampleSizeInput)
+
+    // Submit the form
+    await act(async () => {
+      fireEvent.click(screen.getByText('OK'));
+    });
+
+    // Check if the changed value is displayed in the table
+    const displayedSampleSize = screen.getByText('15');
+    expect(displayedSampleSize).toBeInTheDocument;
+
+    // Click the reset button
+    await act(async () => {
+      fireEvent.click(screen.getByText('Reset'));
+    });
+
+    // Check values have been reset and the display table is gone
+    expect(sampleSizeInput.value).toBe('10');
+    expect(screen.queryByText('15')).not.toBeInTheDocument;
   });
 });

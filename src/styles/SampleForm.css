@@ -1,10 +1,90 @@
+.form-container {
+  margin: 50px auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
 .input {
+  flex: 2;
   width: 100%;
-  padding: 8px;
+  padding: 10px 20px;
+  border-radius: 5px; 
+  border: 1px solid lightgray;
+}
+
+.hypothesized-input label {
+  margin-left: 20px;
+}
+
+.input-error {
+  border-color: red;
+}
+
+.error {
+  color: red;
+  margin-bottom: 5px;
+  align-self: flex-start;
+}
+
+.table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.label-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.table th,
+.table td {
   border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f5f5f5;
 }
 
 .label.disabled {
   color: gray;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.button-ok, .button-reset {
+  border-radius: 5px; 
+  border: 1px solid lightgray;
+  padding: 15px 25px;
+  width: 100px; 
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.button-ok {
+  background-color: #4a90e2;
+  color: white;
+  margin-right: 10px;
+}
+
+.button-reset {
+  background-color: white;
 }
